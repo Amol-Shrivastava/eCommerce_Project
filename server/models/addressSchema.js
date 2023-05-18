@@ -23,6 +23,13 @@ const addressSchema = new Schema(
       type: String,
       required: [true, "Pincode cannot be blank"],
     },
+    belongsTo: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Users",
+        default: [],
+      },
+    ],
   },
   { timestamps: true }
 );

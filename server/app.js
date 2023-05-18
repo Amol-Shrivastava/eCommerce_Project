@@ -2,19 +2,27 @@ require("express-async-errors");
 require("dotenv").config();
 
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const consola = require("consola");
 
 //IMPORTS
 const connectDB = require("./connectDB");
+//ROUTES
+const userRouter = require("./routes/user");
 
 const PORT = process.env.PORT || 4000;
 
 //MIDDLEWARE
 const app = express();
 
-//ROUTES
-
 app.use(express.json());
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.send("Welcome to ecommerce API");
+});
+
+app.use("/user", userRouter);
 
 const start = async () => {
   try {

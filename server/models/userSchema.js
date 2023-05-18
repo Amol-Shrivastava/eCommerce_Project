@@ -1,4 +1,5 @@
 const { mongoose, Schema } = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new Schema(
   {
@@ -14,12 +15,13 @@ const userSchema = new Schema(
       validate: [validateEmail, "Please enter a valid email address"],
     },
     number: {
-      type: Number,
-      min: [6, "Minimum phone number is of 6 digits"],
-      max: [12, "Maximum phone number can be 10 digits"],
-      default: 0000000000,
+      type: String,
+      minLength: [6, "Minimum phone number is of 6 digits"],
+      maxLength: [10, "Maximum phone number can be 10 digits"],
+      default: "0000000000",
+      required: [true, "Phone number is required"],
     },
-    passwords: {
+    password: {
       type: String,
       trim: true,
       required: [true, "Password cannot be blank"],
@@ -40,5 +42,10 @@ function validateEmail(email) {
   const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   return regex.test(email);
 }
+
+userSchema.pre("save", async function (next) {
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 module.exports = mongoose.model("Users", userSchema);
