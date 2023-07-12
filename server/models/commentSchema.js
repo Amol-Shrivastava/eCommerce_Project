@@ -6,6 +6,7 @@ const commentsSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Products",
+        required: [true, "Product id cannot be null"],
       },
     ],
     description: [
@@ -14,6 +15,11 @@ const commentsSchema = new Schema(
         required: [true, "Comment is compulsory"],
       },
     ],
+    commentedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+      required: [true, "Commented by value cannot be null"],
+    },
   },
   { timestamps: true }
 );

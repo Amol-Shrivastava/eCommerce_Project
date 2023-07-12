@@ -28,6 +28,14 @@ const ordersSchema = new Schema(
       enum: ["NOT_DONE", "SUCCESSFUL", "ERROR"],
       default: "NOT_DONE",
     },
+    orderBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+    },
+    orderTo: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+    },
   },
   { timestamps: true }
 );

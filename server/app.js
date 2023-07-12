@@ -7,8 +7,13 @@ const consola = require("consola");
 
 //IMPORTS
 const connectDB = require("./connectDB");
+const { authHandler } = require("./middleware/user");
+
 //ROUTES
 const userRouter = require("./routes/user");
+const productRoutes = require("./routes/products");
+const categoryRoutes = require("./routes/category");
+const commentsRoutes = require("./routes/comments");
 
 const PORT = process.env.PORT || 4000;
 
@@ -18,11 +23,11 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.send("Welcome to ecommerce API");
-});
-
 app.use("/user", userRouter);
+// app.get("/api/auth", authHandler);
+app.use("/api/category", authHandler, categoryRoutes);
+app.use("/api/product", authHandler, productRoutes);
+app.use("/api/comments", authHandler, commentsRoutes);
 
 const start = async () => {
   try {
