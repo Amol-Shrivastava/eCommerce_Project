@@ -121,6 +121,41 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const updateProductImage = async (req, res) => {
+  const { productId } = req.params;
+  const imageName = req.params;
+
+  try {
+    const product = await productModel.findOne({ _id: productId });
+
+    if (!product)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, msg: true });
+
+    const { product_images } = product.product_images;
+    const { originalname, buffer, mimetype } = req.file;
+
+    for (let i = 0; i < product_images.length; ++i) {
+      if (product_images[i].name == imageName) {
+        product_images[i].name = originalname ?? product_images[i].name;
+        product_images[i].buffer = buffer ?? product_images[i].buffer;
+        product_images[i].mimetype = mimetype ?? product_images[i].mimetype;
+      }
+    }
+
+    product.product_images = product_images;
+    await product.save();
+    return res
+      .status(StatusCodes.ACCEPTED)
+      .json({ success: true, msg: "Product image successfully updated" });
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: error.message });
+  }
+};
+
 const findSingleProduct = async (req, res) => {
   const { product_id } = req.params;
 
@@ -167,4 +202,5 @@ module.exports = {
   updateProduct,
   findSingleProduct,
   deleteProduct,
+  updateProductImage,
 };

@@ -6,6 +6,10 @@ const categorySchema = new Schema({
     required: [true, "Category cannot be null"],
     unique: [true, "Category needs to be unique."],
   },
+  description: {
+    type: String,
+    required: [true, "Category Description is mandatory"],
+  },
   products: [
     {
       type: Schema.Types.ObjectId,

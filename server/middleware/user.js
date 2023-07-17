@@ -10,31 +10,10 @@ const { checkForFalsy } = require("../util/validate");
  * @returns Promise for creation of new user
  */
 const registerHandler = async (req, res) => {
-  const {
-    name,
-    email,
-    password,
-    number,
-    street,
-    houseNumber,
-    city,
-    state,
-    pincode,
-  } = req.body;
+  const { name, email, password, number } = req.body;
 
   try {
-    if (
-      !checkForFalsy(
-        name,
-        email,
-        password,
-        number,
-        street,
-        city,
-        state,
-        pincode
-      )
-    ) {
+    if (checkForFalsy(name, email, number)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         msg: "Please fill all the required informations",
@@ -49,20 +28,11 @@ const registerHandler = async (req, res) => {
       });
     }
 
-    const createdAddress = await _makeAddress(
-      street,
-      houseNumber,
-      city,
-      state,
-      pincode
-    );
-
     const userDoc = new userModel({
       name,
       email,
       number,
       password,
-      createdAddress,
     });
 
     await userDoc.save();
@@ -83,27 +53,6 @@ const registerHandler = async (req, res) => {
       msg: error,
     });
   }
-};
-
-/**
- * Function to create new Address
- *
- * @param {String} street
- * @param {String} houseNumber
- * @param {String} city
- * @param {String} state
- * @param {String} pincode
- * @returns promise to save new created address
- */
-const _makeAddress = async (street, houseNumber, city, state, pincode) => {
-  const addressDoc = new addressModel({
-    street,
-    houseNumber,
-    city,
-    state,
-    pincode,
-  });
-  return await addressDoc.save();
 };
 
 /**
@@ -144,11 +93,11 @@ const _tokenGeneration = async (userFound) => {
   };
 
   const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "1d",
   });
 
   const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "2d",
   });
 
   return { accessToken, refreshToken };
@@ -161,7 +110,7 @@ const _tokenGeneration = async (userFound) => {
 const loginHandler = async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (!checkForFalsy(email, password)) {
+    if (checkForFalsy(email, password)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         msg: `Login credentials missing`,

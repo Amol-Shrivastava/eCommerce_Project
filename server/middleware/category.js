@@ -14,16 +14,20 @@ const viewAllCategory = async (req, res) => {
 };
 
 const addCategory = async (req, res) => {
+  const { name, description } = req.body;
   try {
-    const { name } = req.body;
-    const categoryObj = new categoryModel();
-    categoryObj.name = name;
+    if (!_checkFalsy(name, description)) {
+      const categoryObj = new categoryModel({ name, description });
+      await categoryObj.save();
 
-    let categorySaved = await categoryObj.save();
-
-    return res
-      .status(StatusCodes.CREATED)
-      .json({ success: true, msg: categorySaved });
+      return res
+        .status(StatusCodes.CREATED)
+        .json({ success: true, msg: "Category Created" });
+    } else {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, msg: "Name and description is important." });
+    }
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -34,7 +38,7 @@ const addCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const { category_id } = req.params;
-    const { newCategoryVal } = req.body;
+    const { newCategoryName, newCategoryDesc } = req.body;
 
     const categoryExist = await categoryModel.findOne({ _id: category_id });
 
@@ -44,7 +48,8 @@ const updateCategory = async (req, res) => {
         .json({ success: false, msg: "Category does not exists." });
     }
 
-    categoryExist.name = newCategoryVal;
+    categoryExist.name = newCategoryName ?? categoryExist.name;
+    categoryExist.description = newCategoryDesc ?? categoryExist.description;
     await categoryExist.save();
 
     return res
@@ -58,7 +63,7 @@ const updateCategory = async (req, res) => {
 };
 
 const findSingleCategory = async (req, res) => {
-  const { category_name } = req.params;
+  const { category_name } = req.query;
 
   try {
     const category = await categoryModel.findOne({ name: category_name });

@@ -11,9 +11,10 @@ const { authHandler } = require("./middleware/user");
 
 //ROUTES
 const userRouter = require("./routes/user");
-const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/category");
-const commentsRoutes = require("./routes/comments");
+const productRouter = require("./routes/products");
+const categoryRouter = require("./routes/category");
+const commentRoute = require("./routes/comments");
+const addressRouter = require("./routes/address");
 
 const PORT = process.env.PORT || 4000;
 
@@ -23,11 +24,13 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/user", userRouter);
+app.use("/api/v1/user", userRouter);
 // app.get("/api/auth", authHandler);
-app.use("/api/category", authHandler, categoryRoutes);
-app.use("/api/product", authHandler, productRoutes);
-app.use("/api/comments", authHandler, commentsRoutes);
+app.use("/api/v1/", authHandler);
+app.use("/api/v1/address", addressRouter);
+app.use("/api/v1/category", categoryRouter);
+app.use("/api/v1/product", productRouter);
+app.use("/api/v1/comments", commentRoute);
 
 const start = async () => {
   try {
