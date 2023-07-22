@@ -11,8 +11,8 @@ const {
 router
   .post("/addComment", addComment)
   .get("/allComments/:product_id", viewAllCommentsForProduct)
-  .get("/findcategory/:comment_id", findSingleComment)
+  .get("/viewComment/:comment_id", findSingleComment)
   .patch("/updateComment/:comment_id", updateComment)
-  .delete("/deleteCategory/:comment_id", deleteComment);
+  .delete("/deleteComment/:comment_id", deleteComment);
 
 module.exports = router;

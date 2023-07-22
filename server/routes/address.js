@@ -1,14 +1,16 @@
+const router = require("express").Router();
+
 const {
   addAddress,
   deleteAddress,
   updateAddress,
   viewAllAddressOfUser,
 } = require("../middleware/address");
-const router = require("express").Router();
-
-router.post("/createAddress/:userId", addAddress);
-router.delete("/deleteAddress/:addressId/:userId", deleteAddress);
-router.patch("/updateAddress/:addressId/:userId", updateAddress);
-router.get("/getAllAdress/:userId", viewAllAddressOfUser);
+console.log("inside address router");
+router
+  .get("/getAllAddress", viewAllAddressOfUser)
+  .post("/createAddress", addAddress)
+  .delete("/deleteAddress/:addressId", deleteAddress)
+  .patch("/updateAddress/:addressId", updateAddress);
 
 module.exports = router;

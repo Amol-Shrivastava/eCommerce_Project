@@ -8,11 +8,13 @@ const viewAllCommentsForProduct = async (req, res) => {
     const commentsArr = await commentModel
       .find({ product_id })
       .populate("product_id")
-      .populate("commentedBy");
+      .populate("commentedBy")
+      .limit(10);
     if (!commentsArr)
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ success: false, msg: "No comments found for this product" });
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        msg: "No comments were found for this product",
+      });
 
     return res.status(StatusCodes.OK).json({ success: true, msg: commentsArr });
   } catch (error) {
@@ -23,12 +25,25 @@ const viewAllCommentsForProduct = async (req, res) => {
 };
 
 const addComment = async (req, res) => {
+  const { product_id, userId } = req.params;
+  const { description } = req.body;
   try {
-    await commentModel.save(req.body);
+    if (!description)
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        msg: "You cannot post blank comment for a product",
+      });
+
+    let newComment = await commentModel({
+      product_id,
+      description,
+      commentedBy: userId,
+    });
+    await newComment.save();
 
     return res
       .status(StatusCodes.CREATED)
-      .json({ success: true, msg: "Comment posted" });
+      .json({ success: true, msg: "Comment Successfully posted" });
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -54,7 +69,7 @@ const updateComment = async (req, res) => {
 
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, msg: "Comment has been updated" });
+      .json({ success: true, msg: "Comment has been successfull updated" });
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

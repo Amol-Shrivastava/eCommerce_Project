@@ -7,14 +7,16 @@ const consola = require("consola");
 
 //IMPORTS
 const connectDB = require("./connectDB");
-const { authHandler } = require("./middleware/user");
+const { authHandler } = require("./middleware/auth");
 
 //ROUTES
+const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const productRouter = require("./routes/products");
 const categoryRouter = require("./routes/category");
-const commentRoute = require("./routes/comments");
+const commentRouter = require("./routes/comments");
 const addressRouter = require("./routes/address");
+const { StatusCodes } = require("http-status-codes");
 
 const PORT = process.env.PORT || 4000;
 
@@ -24,13 +26,15 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/auth", authRouter);
 // app.get("/api/auth", authHandler);
+
 app.use("/api/v1/", authHandler);
+app.use("/api/v1/user", userRouter);
 app.use("/api/v1/address", addressRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/product", productRouter);
-app.use("/api/v1/comments", commentRoute);
+app.use("/api/v1/comments", commentRouter);
 
 const start = async () => {
   try {

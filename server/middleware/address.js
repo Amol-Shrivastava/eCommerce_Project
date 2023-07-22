@@ -5,7 +5,7 @@ const addressModel = require("../models/addressSchema");
 
 const addAddress = async (req, res) => {
   const { street, houseNumber, city, state, pincode } = req.body;
-  const { userId: belongsTo } = req.params;
+  const { userId: belongsTo } = req.user;
   try {
     if (!checkForFalsy(street, city, state, pincode)) {
       const user = await _checkUserAndAddress(belongsTo, "user");
@@ -24,7 +24,10 @@ const addAddress = async (req, res) => {
         belongsTo,
       });
 
-      await newAddress.save();
+      const savedAddress = await newAddress.save();
+      user.address.push(savedAddress._id);
+      await user.save();
+
       return res
         .status(StatusCodes.CREATED)
         .json({ success: true, msg: "New Address Created." });
@@ -59,6 +62,7 @@ const updateAddress = async (req, res) => {
     existingAddress.pincode = pincode ?? existingAddress.strpincodeeet;
 
     await existingAddress.save();
+
     return res
       .status(StatusCodes.OK)
       .json({ success: true, msg: "Address is updated" });
@@ -70,7 +74,7 @@ const updateAddress = async (req, res) => {
 };
 
 const viewAllAddressOfUser = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
   try {
     const user = await _checkUserAndAddress(userId, "user");
     if (!user)
@@ -93,7 +97,8 @@ const viewAllAddressOfUser = async (req, res) => {
 };
 
 const deleteAddress = async (req, res) => {
-  const { addressId, userId } = req.params;
+  const { addressId } = req.params;
+  const { userId } = req.user;
 
   try {
     const user = await _checkUserAndAddress(userId, "user");
@@ -105,6 +110,9 @@ const deleteAddress = async (req, res) => {
         .json({ success: false, msg: "Given address/user does not exists." });
 
     await addressModel.findByIdAndDelete(addressId);
+
+    user.address = user.address.filter(({ _id }) => _id != addressId);
+    await user.save();
 
     return res
       .status(StatusCodes.OK)
